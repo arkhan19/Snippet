@@ -15,7 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from snippets import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Create a urls file in each app, but since it's a small reference added here itself.
+    path('snippets/', views.snippet_list),
+    path('snippets/<int:pk>', views.snippet_detail),
 ]
