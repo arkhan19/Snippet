@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from snippets import views
+from django.conf.urls import include  # For Browsable API's login
 
 from rest_framework.urlpatterns import format_suffix_patterns
 
@@ -29,6 +30,13 @@ urlpatterns = [
     # Class Based Views
     path('snippets/', views.SnippetList.as_view()),
     path('snippets/<int:pk>/', views.SnippetDetail.as_view()), # use forward slash in the end to limit the url
+
+    # User Serializer and User Views
+    path('users/', views.UserList.as_view()),
+    path('users/<int:pk>/', views.UserDetail.as_view()),
+
+    # Authentication
+    path('api-auth/', include('rest_framework.urls')),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

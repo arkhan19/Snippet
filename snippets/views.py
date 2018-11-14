@@ -1,6 +1,8 @@
+from django.contrib.auth.models import User
 from django.shortcuts import render
 from snippets.models import Snippet
-from snippets.serializers import SnippetSerializer
+from snippets.serializers import SnippetSerializer, UserSerializer
+from snippets.permissions import IsOwnerOrReadOnly
 
 from django.http import HttpResponse, JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -14,7 +16,8 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework import mixins
 
-
+# Authentication
+from rest_framework import permissions
 # Create your views here.
 # Mostly post to this function will come from places which doesn't have CSRF Token, so we use csrf_excempt decorator
 
@@ -214,8 +217,29 @@ Generic Views provide built-in mixins, makes the code more concise.
 class SnippetList(generics.ListCreateAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)  # Create will pass additional field i.e., Owner
 
 
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly,)
+
+
+"""
+To Display the Users // Read Only views
+"""
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

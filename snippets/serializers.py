@@ -1,13 +1,20 @@
 from rest_framework import serializers
 from .models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
+from django.contrib.auth.models import User
+from snippets.models import Snippet
 
 
 # A Shortcut to creating serializers to create set of fields and simple default implementation for the create and update
 #  methods
 class SnippetSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username') # Snippets are associated with the owner.username now.
+    # "source" tells which attribute is used to populate this (owner) field.
+    # "ReadOnlyField" only RO and used for serialized repr, but will not be used for updating model instances when de se
+
     class Meta:
         model = Snippet
-        fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
+        fields = ('id', 'title', 'code', 'owner','linenos', 'language', 'style')
+
 
 # class SnippetSerializer(serializers.Serializer):
 #     # Define the fields that need to be serialized or deserialized
@@ -80,3 +87,11 @@ class SnippetSerializer(serializers.ModelSerializer):
     # serializer.data
     # # [OrderedDict([('id', 1), ('title', u''), ('code', u'foo = "bar"\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 2), ('title', u''), ('code', u'print "hello, world"\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 3), ('title', u''), ('code', u'print "hello, world"'), ('linenos', False), ('language', 'python'), ('style', 'friendly')])]
     #
+
+# Authentication using User Serializers
+class UserSerializer(serializers.ModelSerializer):
+    snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all()) # to cou reverse relation
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'snippets')
