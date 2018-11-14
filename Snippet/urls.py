@@ -23,8 +23,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Create a urls file in each app, but since it's a small reference added here itself.
-    path('snippets/', views.snippet_list),
-    path('snippets/<int:pk>', views.snippet_detail),
+    # path('snippets/', views.snippet_list),
+    # path('snippets/<int:pk>', views.snippet_detail),
+
+    # Class Based Views
+    path('snippets/', views.SnippetList.as_view()),
+    path('snippets/<int:pk>/', views.SnippetDetail.as_view()), # use forward slash in the end to limit the url
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
